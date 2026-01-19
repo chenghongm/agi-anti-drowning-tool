@@ -25,8 +25,32 @@ export class BaseAdapter {
 
   // 默认实现：根据 messageEntry 选择器查找消息集合，子类可以覆盖以实现更复杂的降级策略
   findMessages() {
-    const sel = this.selectors && this.selectors.messageEntry;
-    if (!sel) return [];
-    return Array.from(document.querySelectorAll(sel));
+    const s = this.selectors || {};
+    // primary: explicit messageEntry
+    if (s.messageEntry) {
+      let nodes = document.querySelectorAll(s.messageEntry);
+      if (nodes && nodes.length) return Array.from(nodes);
+    }
+
+    // fallback: elements that carry the configured idAttribute
+    if (s.idAttribute) {
+      let nodes = document.querySelectorAll('[' + s.idAttribute + ']');
+      if (nodes && nodes.length) return Array.from(nodes);
+    }
+
+    // generic fallbacks common across chat UIs
+    const fallbacks = [
+      'article',
+      'div[role="article"]',
+      'div[data-testid*="message"]',
+      'div[class*="message"]',
+      'div[data-message-id]'
+    ];
+    for (const fb of fallbacks) {
+      const nodes = document.querySelectorAll(fb);
+      if (nodes && nodes.length) return Array.from(nodes);
+    }
+
+    return [];
   }
 }

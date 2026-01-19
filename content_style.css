@@ -38,3 +38,32 @@ article.wb-expanded {
     color: white; border-radius: 50%; display: flex; align-items: center; 
     justify-content: center; font-size: 12px; backdrop-filter: blur(4px);
 }
+
+/* 彻底隐藏标记为 start 的消息内容 */
+[data-wb-role="start"] {
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 强制保留 S/E/R 组件可见 */
+[data-wb-role="start"] .wb-branch-group {
+    visibility: visible !important;
+    height: auto !important;
+    position: relative;
+    top: 0;
+    z-index: 10000;
+    background: white; /* 确保在隐藏的节点上方有背景 */
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 优化按钮基础样式确保不被覆盖 */
+.wb-branch-group {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}

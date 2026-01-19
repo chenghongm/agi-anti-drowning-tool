@@ -1,4 +1,6 @@
 // adapters/chatgpt.js
+import { BaseAdapter } from './base.js';
+
 export class ChatGPTAdapter extends BaseAdapter {
   getSelectors() {
     return {
