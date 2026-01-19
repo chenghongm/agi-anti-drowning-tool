@@ -1,0 +1,40 @@
+/* 1. 基础折叠：支线内容变为“百叶窗” */
+article[data-wb-role="mid"], article[data-wb-role="end"] {
+    max-height: 48px !important;
+    opacity: 0.2;
+    overflow: hidden;
+    filter: grayscale(1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* 增加平滑感 */
+    pointer-events: none;
+}
+
+/* 2. 延时展开：只有当 JS 加上 .wb-expanded 类时才展开 */
+article.wb-expanded {
+    max-height: 2000px !important;
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: auto !important;
+}
+
+/* 3. 代码块独立控制 */
+.wb-code-minimized {
+    max-height: 100px !important;
+    overflow: hidden;
+    position: relative;
+}
+.wb-code-minimized::after {
+    content: "CODE COLLAPSED";
+    position: absolute; bottom: 0; width: 100%;
+    text-align: center; background: rgba(0,0,0,0.5); color: white; font-size: 10px;
+}
+
+/* 4. 手机端导航球 */
+#wb-nav-panel {
+    position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
+    z-index: 10000; display: flex; flex-direction: column; gap: 8px;
+}
+.wb-nav-dot {
+    width: 32px; height: 32px; background: rgba(16, 163, 127, 0.7);
+    color: white; border-radius: 50%; display: flex; align-items: center; 
+    justify-content: center; font-size: 12px; backdrop-filter: blur(4px);
+}

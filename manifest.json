@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "AGI Anti-Drowning Tool",
+  "version": "1.0",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "css": ["content_style.css"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
