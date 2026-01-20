@@ -1,26 +1,102 @@
-/* 1. 基础折叠：支线内容变为“百叶窗” */
-article[data-wb-role="mid"], article[data-wb-role="end"] {
+/* ============================================================
+   1. 核心折叠逻辑 (保留 1.0 百叶窗效果)
+   ============================================================ */
+/* --- 1. 核心折叠：修正 pointer-events 否则无法触发 hover --- */
+article[data-wb-role="mid"], 
+article[data-wb-role="end"] {
     max-height: 48px !important;
     opacity: 0.2;
     overflow: hidden;
     filter: grayscale(1);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* 增加平滑感 */
-    pointer-events: none;
+    transition: all 0.4s ease;
+    /* 修正：必须改为 auto，否则 JS 监听不到 mouseenter */
+    pointer-events: auto !important; 
+    cursor: zoom-in;
 }
 
-/* 2. 延时展开：只有当 JS 加上 .wb-expanded 类时才展开 */
+/* 延时展开 */
 article.wb-expanded {
     max-height: 2000px !important;
     opacity: 1 !important;
     filter: none !important;
     pointer-events: auto !important;
+    background-color: rgba(16, 163, 127, 0.7) !important; /* 展开时添加淡绿色背景 */
 }
 
-/* 3. 代码块独立控制 */
+/* ============================================================
+   2. Start Node 特殊处理 (根据你的新需求：完全隐藏)
+   ============================================================ */
+/* --- 2. 只有正式 Start 才折叠，Pending(虚线)不折叠 --- */
+[data-wb-role="start"] {
+    height: auto !important;
+    min-height: 24px !important;
+    overflow: visible !important;
+}
+
+/* 彻底隐藏 Start Node 的原始内容 */
+[data-wb-role="start"] > *:not(.wb-branch-group) {
+    display: none !important;
+}
+
+/* ============================================================
+   3. Pending 待定状态 (虚线绿框)
+   ============================================================ */
+[data-wb-pending="true"] {
+    border: 2px dashed #4CAF50 !important;
+    background-color: rgba(144, 238, 144, 0.05) !important;
+    max-height: none !important; /* 确保不被折叠 */
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* ============================================================
+   4. S/E/R 按钮组 UI (确保悬浮且不消失)
+   ============================================================ */
+.wb-branch-group {
+    display: flex !important;
+    position: absolute !important;
+    top: -12px !important;
+    left: 10px !important;
+    z-index: 10000 !important;
+    gap: 4px !important;
+    background: #ffffff !important;
+    padding: 3px 6px !important;
+    border: 1px solid #4CAF50 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+.wb-branch-btn {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    padding: 2px 6px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+}
+
+/* 按钮状态颜色 */
+.wb-branch-btn[data-action="start"] { color: #2e7d32 !important; }
+.wb-branch-btn[data-action="end"]   { color: #1565c0 !important; }
+.wb-branch-btn[data-action="remove"] { color: #d32f2f !important; }
+
+/* 禁用态：灰色+删除线 */
+.wb-branch-btn:disabled {
+    color: #bbb !important;
+    background-color: #f0f0f0 !important;
+    opacity: 0.6 !important;
+    text-decoration: line-through !important;
+    cursor: not-allowed !important;
+}
+
+/* ============================================================
+   5. 代码块独立控制 & 手机端导航 (完全保留)
+   ============================================================ */
 .wb-code-minimized {
     max-height: 100px !important;
     overflow: hidden;
     position: relative;
+    border-bottom: 2px solid #ff9800 !important;
 }
 .wb-code-minimized::after {
     content: "CODE COLLAPSED";
@@ -28,7 +104,6 @@ article.wb-expanded {
     text-align: center; background: rgba(0,0,0,0.5); color: white; font-size: 10px;
 }
 
-/* 4. 手机端导航球 */
 #wb-nav-panel {
     position: fixed; right: 10px; top: 50%; transform: translateY(-50%);
     z-index: 10000; display: flex; flex-direction: column; gap: 8px;
@@ -37,33 +112,5 @@ article.wb-expanded {
     width: 32px; height: 32px; background: rgba(16, 163, 127, 0.7);
     color: white; border-radius: 50%; display: flex; align-items: center; 
     justify-content: center; font-size: 12px; backdrop-filter: blur(4px);
-}
-
-/* 彻底隐藏标记为 start 的消息内容 */
-[data-wb-role="start"] {
-    visibility: hidden !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
-
-/* 强制保留 S/E/R 组件可见 */
-[data-wb-role="start"] .wb-branch-group {
-    visibility: visible !important;
-    height: auto !important;
-    position: relative;
-    top: 0;
-    z-index: 10000;
-    background: white; /* 确保在隐藏的节点上方有背景 */
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* 优化按钮基础样式确保不被覆盖 */
-.wb-branch-group {
-    display: inline-flex !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
+    cursor: pointer;
 }
