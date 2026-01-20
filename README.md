@@ -24,7 +24,7 @@ Start 节点清理: 标记为 Start 的节点仅保留控制条，原始内容�
 
 零干扰: 移除了多余的局部按钮，代码块随父节点（消息块）的 Hover 状态同步展开/收起。
 
-4. 手机端导航球 (Nav Panel)
+4. web端导航球 (Nav Panel)
 快速锚点: 在页面右侧生成数字索引球，点击即可一键滚动到对应的 Start Node 位置。
 
 全局控制: 提供全局代码块隐藏/显示开关。
@@ -93,7 +93,7 @@ Seamless Folding: Automatically detects long code blocks and applies a mask-imag
 
 Zero Distraction: Removed redundant local buttons. Code blocks expand/collapse in sync with the parent message's hover state.
 
-4. Navigation Panel (Mobile-Friendly)
+4. Navigation Panel (web）
 Quick Anchors: Generates a numerical index panel on the right side of the screen. Clicking a number scrolls the page directly to the corresponding Start Node.
 
 Global Toggle: Includes a global switch to toggle code block visibility across the entire conversation.
