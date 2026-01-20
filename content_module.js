@@ -36,7 +36,7 @@ function loadPairs() {
     try {
         branchPairs = JSON.parse(localStorage.getItem('wb_pairs') || '[]') || [];
     } catch (e) {
-        wbLog('WB: loadPairs JSON parse failed', e);
+        // wbLog('WB: loadPairs JSON parse failed', e);
         branchPairs = [];
     }
 }
@@ -44,12 +44,12 @@ function loadPairs() {
 function savePairs() {
     try {
         localStorage.setItem('wb_pairs', JSON.stringify(branchPairs || []));
-        wbLog('WB: savePairs ->', branchPairs);
+        // wbLog('WB: savePairs ->', branchPairs);
     } catch (e) {
         wbLog('WB: savePairs failed', e);
     }
 }
-wbLog('WB: currentAdapter initialized ->', currentAdapter.constructor.name, currentAdapter.selectors);
+// wbLog('WB: currentAdapter initialized ->', currentAdapter.constructor.name, currentAdapter.selectors);
 
 // --- 核心：属性标记与染色（使用 adapter 提供的消息集合和 id） ---
 const applyLogic = () => {
@@ -62,15 +62,15 @@ const applyLogic = () => {
     }
 
     const messages = currentAdapter.findMessages();
-    wbLog('WB: applyLogic found messages:', messages ? messages.length : 0);
+    // wbLog('WB: applyLogic found messages:', messages ? messages.length : 0);
     if (!messages || messages.length === 0) {
         wbLog('WB: no messages found by adapter; selectors:', currentAdapter.selectors);
         return;
     }
-    wbLog('WB: branchPairs (loaded):', branchPairs);
+    // wbLog('WB: branchPairs (loaded):', branchPairs);
 
     const res = detectAndMark(messages, branchPairs, currentAdapter);
-    wbLog('WB: detectAndMark result:', res);
+    // wbLog('WB: detectAndMark result:', res);
     // update button states (enable/disable S/E based on roles and pending start)
     updateButtonStates();
     updateMobileNav();
@@ -215,7 +215,7 @@ function injectGlobalToggle() {
 // --- 功能：UI 注入（通过 adapter.findMessages 替代硬编码选择器） ---
 const injectUI = () => {
     const messages = currentAdapter.findMessages();
-    wbLog('WB: injectUI found messages:', messages ? messages.length : 0);
+    // wbLog('WB: injectUI found messages:', messages ? messages.length : 0);
     // build id -> index map for ordering checks
     const idIndex = new Map();
     messages.forEach((m, i) => { const id = currentAdapter.getMessageId(m); if (id) idIndex.set(id, i); });
@@ -322,7 +322,7 @@ const injectUI = () => {
  * @param {string} turnId - 消息节点的唯一 ID
  */
 function handleBranchAction(action, turnId) {
-    wbLog(`WB: Action [${action}] triggered on [${turnId}]`);
+    // wbLog(`WB: Action [${action}] triggered on [${turnId}]`);
 
     if (action === 'start') {
         // 1. 设置待定起点
@@ -338,7 +338,7 @@ function handleBranchAction(action, turnId) {
             currentMsg.setAttribute('data-wb-pending', 'true');
         }
 
-        wbLog('WB: Pending start set. Waiting for End node.');
+        // wbLog('WB: Pending start set. Waiting for End node.');
         // 刷新 UI 使 S 按钮进入 disabled 状态
         applyLogic();
 
@@ -346,7 +346,7 @@ function handleBranchAction(action, turnId) {
         // 1. 只有存在 pendingStartId 时才允许建立 Pair
         if (pendingStartId) {
             if (pendingStartId === turnId) {
-                wbLog('WB: Cannot set same node as start and end.');
+                // wbLog('WB: Cannot set same node as start and end.');
                 return;
             }
 
@@ -364,7 +364,7 @@ function handleBranchAction(action, turnId) {
 
             savePairs();
             applyLogic();
-            wbLog('WB: Branch pair established and saved.');
+            // wbLog('WB: Branch pair established and saved.');
         } else {
             alert('请先选择一个起点 (S)');
         }
@@ -400,7 +400,7 @@ function handleBranchAction(action, turnId) {
 
             savePairs();
             applyLogic();
-            wbLog('WB: Branch removed.');
+            // wbLog('WB: Branch removed.');
         } else {
             // 特殊情况：如果只是清除尚未闭合的 Pending 状态
             if (pendingStartId === turnId) {
@@ -409,7 +409,7 @@ function handleBranchAction(action, turnId) {
                     el.removeAttribute('data-wb-pending');
                 });
                 applyLogic();
-                wbLog('WB: Pending status cleared.');
+                // wbLog('WB: Pending status cleared.');
             }
         }
     }
