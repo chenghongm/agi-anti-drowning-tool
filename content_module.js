@@ -99,7 +99,7 @@ function setupHoverLogic(el) {
         if (el.hasAttribute('data-wb-role') && el.getAttribute('data-wb-role') !== 'start') {
             hoverTimer = setTimeout(() => {
                 el.classList.add('wb-expanded');
-            }, 350);
+            }, 550);
         }
     });
     el.addEventListener('mouseleave', () => {
