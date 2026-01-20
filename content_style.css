@@ -48,6 +48,11 @@ article.wb-expanded {
     opacity: 1 !important;
     filter: none !important;
 }
+[data-wb-pending="true"] .wb-branch-btn[data-action="start"] {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    opacity: 1 !important;
+}
 
 /* ============================================================
    4. S/E/R 按钮组 UI (确保悬浮且不消失)
@@ -114,3 +119,43 @@ article.wb-expanded {
     justify-content: center; font-size: 12px; backdrop-filter: blur(4px);
     cursor: pointer;
 }
+
+/* 基础状态：允许平滑过渡 */
+pre {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    border-bottom: 2px solid transparent;
+}
+
+/* 状态 A: 隐藏模式 (全局开启或手动最小化) */
+body.wb-global-code-hide pre,
+pre.wb-code-minimized {
+    max-height: 80px !important; /* 更紧凑的高度 */
+    opacity: 0.4 !important;    /* 降低透明度，类似 message block */
+    overflow: hidden !important;
+    filter: grayscale(0.8);      /* 稍微去色，减少视觉干扰 */
+    cursor: zoom-in;
+    
+    /* 核心：Blur Out 虚化边缘 */
+    mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+    
+    border-bottom: 2px solid #10a37f !important; /* 底部绿色装饰线提醒有内容 */
+}
+
+/* 状态 B: 展开模式 (当消息被 Hover 时自动联动) */
+article.wb-expanded pre,
+pre.wb-code-expanded {
+    max-height: 5000px !important; /* 足够大的高度 */
+    opacity: 1 !important;
+    filter: none !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    border-bottom: 2px solid transparent !important;
+}
+
+/* 适配：如果代码块在 Start Node 里，默认不显示（因为内容被 display: none 了） */
+[data-wb-role="start"] pre {
+    display: none !important;
+}
+
