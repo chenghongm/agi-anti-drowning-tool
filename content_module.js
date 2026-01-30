@@ -1,5 +1,6 @@
 import { ChatGPTAdapter } from './adapters/chatgpt.js';
 import { ClaudeAdapter } from './adapters/claude.js';
+import { GrokAdapter } from './adapters/grok.js';
 import { detectAndMark } from './core/detection.js';
 
 // Lightweight logger that mirrors to page console and posts messages to the extension
@@ -21,12 +22,27 @@ function wbLog(...args) {
 // Initialize adapter based on host; fallback to ChatGPTAdapter
 const currentAdapter = (function pickAdapter() {
     try {
-        if (window.location.host.includes('claude')) {
+        const host = window.location.host || '';
+        if (host.includes('x.ai') || host.includes('grok.com')) {
+            return new GrokAdapter();
+        }
+        if (host.includes('claude')) {
             return new ClaudeAdapter();
         }
     } catch (e) { /* ignore */ }
     return new ChatGPTAdapter();
 })();
+
+// Host marker classes for site-specific CSS tweaks
+try {
+    const root = document.documentElement || document.body;
+    if (root) {
+        root.classList.remove('wb-host-chatgpt', 'wb-host-claude', 'wb-host-grok');
+        if (currentAdapter instanceof GrokAdapter) root.classList.add('wb-host-grok');
+        else if (currentAdapter instanceof ClaudeAdapter) root.classList.add('wb-host-claude');
+        else root.classList.add('wb-host-chatgpt');
+    }
+} catch (e) { /* ignore */ }
 
 let branchPairs = JSON.parse(localStorage.getItem('wb_pairs') || '[]');
 let pendingStartId = null;
@@ -97,13 +113,29 @@ function setupHoverLogic(el) {
     });
 }
 
+function getMessageElementById(msgId) {
+    try {
+        if (!msgId) return null;
+        const idAttr = currentAdapter && currentAdapter.selectors && currentAdapter.selectors.idAttribute;
+        if (!idAttr) return null;
+
+        if (idAttr === 'id') return document.getElementById(msgId);
+
+        const attrSel = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(idAttr) : idAttr;
+        const valSel = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(msgId) : msgId;
+        return document.querySelector(`[${attrSel}="${valSel}"]`);
+    } catch (e) {
+        return null;
+    }
+}
+
 // Centralized updater for S/E/R button states
 function updateButtonStates() {
     try {
         document.querySelectorAll('.wb-branch-btn').forEach(btn => {
             const msgId = btn.dataset.msgId;
             const action = btn.dataset.action;
-            const msgEl = msgId ? document.querySelector(`[data-turn-id="${msgId}"]`) : null;
+            const msgEl = getMessageElementById(msgId);
             const role = msgEl ? msgEl.getAttribute('data-wb-role') : null;
 
             let disabled = false;
@@ -333,7 +365,7 @@ function handleBranchAction(action, turnId) {
             el.removeAttribute('data-wb-pending');
         });
 
-        const currentMsg = document.querySelector(`[data-turn-id="${turnId}"]`);
+        const currentMsg = getMessageElementById(turnId);
         if (currentMsg) {
             currentMsg.setAttribute('data-wb-pending', 'true');
         }

@@ -5,7 +5,7 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "matches": ["https://chatgpt.com/*", "https://claude.ai/*", "https://x.ai/*", "https://*.x.ai/*", "https://grok.com/*"],
       "css": ["content_style.css"],
       "js": ["content_script.js"],
       "run_at": "document_idle"

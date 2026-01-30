@@ -2,8 +2,8 @@
    1. 核心折叠逻辑 (保留 1.0 百叶窗效果)
    ============================================================ */
 /* --- 1. 核心折叠：修正 pointer-events 否则无法触发 hover --- */
-article[data-wb-role="mid"], 
-article[data-wb-role="end"] {
+[data-wb-role="mid"],
+[data-wb-role="end"] {
     max-height: 48px !important;
     opacity: 0.2;
     overflow: hidden;
@@ -15,7 +15,7 @@ article[data-wb-role="end"] {
 }
 
 /* 延时展开 */
-article.wb-expanded {
+.wb-expanded {
     max-height: 2000px !important;
     opacity: 1 !important;
     filter: none !important;
@@ -60,7 +60,7 @@ article.wb-expanded {
 .wb-branch-group {
     display: flex !important;
     position: absolute !important;
-    top: -12px !important;
+    top: -20px !important;
     left: 10px !important;
     z-index: 10000 !important;
     gap: 4px !important;
@@ -69,6 +69,18 @@ article.wb-expanded {
     border: 1px solid #4CAF50 !important;
     border-radius: 6px !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+
+/* Grok (x.ai) tweak: pull buttons into the left gutter for easier visibility */
+.wb-host-grok .wb-branch-group {
+    left: -62px !important;
+}
+
+/* Grok (x.ai) small screens */
+@media (max-width: 640px) {
+    .wb-host-grok .wb-branch-group {
+        left: -12px !important;
+    }
 }
 
 .wb-branch-btn {
@@ -158,4 +170,3 @@ pre.wb-code-expanded {
 [data-wb-role="start"] pre {
     display: none !important;
 }
-
