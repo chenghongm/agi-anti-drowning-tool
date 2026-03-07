@@ -2,6 +2,7 @@ import { ChatGPTAdapter } from './adapters/chatgpt.js';
 import { ClaudeAdapter } from './adapters/claude.js';
 import { GrokAdapter } from './adapters/grok.js';
 import { detectAndMark } from './core/detection.js';
+import { GeminiAdapter } from './adapters/gemini.js';
 
 // Lightweight logger that mirrors to page console and posts messages to the extension
 function serializeArg(a) {
@@ -29,6 +30,9 @@ const currentAdapter = (function pickAdapter() {
         if (host.includes('claude')) {
             return new ClaudeAdapter();
         }
+         if (host.includes('gemini')) {
+            return new GeminiAdapter();
+        }
     } catch (e) { /* ignore */ }
     return new ChatGPTAdapter();
 })();
@@ -37,9 +41,10 @@ const currentAdapter = (function pickAdapter() {
 try {
     const root = document.documentElement || document.body;
     if (root) {
-        root.classList.remove('wb-host-chatgpt', 'wb-host-claude', 'wb-host-grok');
+        root.classList.remove('wb-host-chatgpt', 'wb-host-claude', 'wb-host-grok', 'wb-host-gemini');
         if (currentAdapter instanceof GrokAdapter) root.classList.add('wb-host-grok');
         else if (currentAdapter instanceof ClaudeAdapter) root.classList.add('wb-host-claude');
+        else if (currentAdapter instanceof GeminiAdapter) root.classList.add('wb-host-gemini'); 
         else root.classList.add('wb-host-chatgpt');
     }
 } catch (e) { /* ignore */ }
@@ -346,6 +351,8 @@ const injectUI = () => {
 
     applyLogic();
 };
+
+
 
 // Handler for S/E/R actions
 /**
