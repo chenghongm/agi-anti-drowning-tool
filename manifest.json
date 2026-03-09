@@ -2,20 +2,39 @@
   "manifest_version": 3,
   "name": "AGI Anti-Drowning Tool",
   "version": "1.0",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*", "https://claude.ai/*", "https://x.ai/*", "https://*.x.ai/*", "https://grok.com/*"],
-      "css": ["content_style.css"],
-      "js": ["content_script.js"],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://x.ai/*",
+        "https://*.x.ai/*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*",
+        "https://*.google.com/*"
+      ],
+      "css": [
+        "content_style.css"
+      ],
+      "js": [
+        "content_script.js"
+      ],
       "run_at": "document_idle"
     }
-  ]
-  ,
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["content_module.js", "adapters/*.js", "core/*.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "content_module.js",
+        "adapters/*.js",
+        "core/*.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }
