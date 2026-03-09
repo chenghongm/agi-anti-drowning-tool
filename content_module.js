@@ -31,6 +31,7 @@ const currentAdapter = (function pickAdapter() {
             return new ClaudeAdapter();
         }
          if (host.includes('gemini')) {
+            console.debug('Host detected as Gemini based on URL. Initializing GeminiAdapter.');
             return new GeminiAdapter();
         }
     } catch (e) { /* ignore */ }
@@ -459,7 +460,7 @@ const updateMobileNav = () => {
     let nav = document.getElementById('wb-nav-panel') || document.createElement('div');
     nav.id = 'wb-nav-panel'; document.body.appendChild(nav);
     // Clear nav and add a scroll-to-bottom control (use JS event listeners to satisfy CSP)
-    nav.innerHTML = '';
+    nav.replaceChildren();
     const topDot = document.createElement('div');
     topDot.className = 'wb-nav-dot';
     topDot.innerText = '↓';
