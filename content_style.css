@@ -83,6 +83,17 @@
     }
 }
 
+.wb-host-claude [data-test-render-count] {
+    position: relative !important;
+}
+
+.wb-host-claude .wb-branch-group {
+    top: -34px !important;
+    left: 4px !important;
+}
+
+
+
 .wb-branch-btn {
     font-size: 11px !important;
     font-weight: 800 !important;

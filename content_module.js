@@ -85,7 +85,6 @@ const applyLogic = () => {
         wbLog('WB: failed to parse wb_pairs from localStorage', e);
         branchPairs = [];
     }
-
     const messages = currentAdapter.findMessages();
     // wbLog('WB: applyLogic found messages:', messages ? messages.length : 0, currentAdapter);
     if (!messages || messages.length === 0) {
@@ -319,6 +318,11 @@ const injectUI = () => {
         // fall back to injecting on the message container itself.
         if (attachPoint && (attachPoint.matches?.('pre,code') || attachPoint.closest?.('pre,code'))) {
             attachPoint = null;
+        }
+
+        // 新增 for claude，如果 adapter 提供了 findActionArea，用它（支持向上查找）
+        if (!attachPoint && currentAdapter.findActionArea) {
+            attachPoint = currentAdapter.findActionArea(el);
         }
         if (!attachPoint) {
             // fallback: prepend to element
