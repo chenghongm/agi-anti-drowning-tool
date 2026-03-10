@@ -24,15 +24,18 @@ function wbLog(...args) {
 const currentAdapter = (function pickAdapter() {
     try {
         const host = window.location.host || '';
+
         if (host.includes('x.ai') || host.includes('grok.com')) {
             return new GrokAdapter();
         }
         if (host.includes('claude')) {
             return new ClaudeAdapter();
         }
-         if (host.includes('gemini')) {
-            console.debug('Host detected as Gemini based on URL. Initializing GeminiAdapter.');
+        if (host.includes('gemini')) {
             return new GeminiAdapter();
+        }
+        if (host.includes('claude')) {
+            return new ClaudeAdapter();
         }
     } catch (e) { /* ignore */ }
     return new ChatGPTAdapter();
@@ -45,7 +48,7 @@ try {
         root.classList.remove('wb-host-chatgpt', 'wb-host-claude', 'wb-host-grok', 'wb-host-gemini');
         if (currentAdapter instanceof GrokAdapter) root.classList.add('wb-host-grok');
         else if (currentAdapter instanceof ClaudeAdapter) root.classList.add('wb-host-claude');
-        else if (currentAdapter instanceof GeminiAdapter) root.classList.add('wb-host-gemini'); 
+        else if (currentAdapter instanceof GeminiAdapter) root.classList.add('wb-host-gemini');
         else root.classList.add('wb-host-chatgpt');
     }
 } catch (e) { /* ignore */ }
@@ -84,7 +87,7 @@ const applyLogic = () => {
     }
 
     const messages = currentAdapter.findMessages();
-    // wbLog('WB: applyLogic found messages:', messages ? messages.length : 0);
+    // wbLog('WB: applyLogic found messages:', messages ? messages.length : 0, currentAdapter);
     if (!messages || messages.length === 0) {
         wbLog('WB: no messages found by adapter; selectors:', currentAdapter.selectors);
         return;
@@ -125,7 +128,13 @@ function getMessageElementById(msgId) {
         const idAttr = currentAdapter && currentAdapter.selectors && currentAdapter.selectors.idAttribute;
         if (!idAttr) return null;
 
-        if (idAttr === 'id') return document.getElementById(msgId);
+        if (idAttr === 'id') {
+            // 先用原生 getElementById
+            const el = document.getElementById(msgId);
+            if (el) return el;
+            // fallback：Gemini host 元素 ID 存在 data-wb-turn-id 上
+            return document.querySelector(`[data-wb-turn-id="${CSS.escape(msgId)}"]`) || null;
+        }
 
         const attrSel = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(idAttr) : idAttr;
         const valSel = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(msgId) : msgId;
@@ -134,7 +143,6 @@ function getMessageElementById(msgId) {
         return null;
     }
 }
-
 // Centralized updater for S/E/R button states
 function updateButtonStates() {
     try {
@@ -153,6 +161,7 @@ function updateButtonStates() {
 
             // When a start is pending, disable both Start and End on the same message
             if (pendingStartId && msgId === pendingStartId && (action === 'start' || action === 'end')) {
+                console.debug(`Disabling ${action} button on pending start message [${msgId}] ${pendingStartId ? '(pendingStartId: ' + pendingStartId + ')' : ' (no pending start)'}`);
                 disabled = true;
             }
 
@@ -264,7 +273,7 @@ const injectUI = () => {
         // --- 1.新增过滤逻辑 ---
         // -1. 检查当前节点是否是 pre 或被 pre 包裹
         if (el.matches?.('pre,code') || el.closest('pre')) return;
-        
+
         // -2. 检查是否是 ChatGPT 的代码块容器 (通常带有特殊的类名)
         if (el.querySelector('.code-block__container') || el.classList.contains('code-block__container')) return;
 
@@ -352,8 +361,6 @@ const injectUI = () => {
 
     applyLogic();
 };
-
-
 
 // Handler for S/E/R actions
 /**

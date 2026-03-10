@@ -19,6 +19,7 @@ export function detectAndMark(messages, branchPairs, adapter) {
   branchPairs.forEach(pair => {
     const startIdx = idIndex.get(pair.startId);
     const endIdx = idIndex.get(pair.endId);
+    // console.log('WB detect:', pair.startId, '->', startIdx, '|', pair.endId, '->', endIdx);
     if (startIdx === undefined || endIdx === undefined) return;
 
     const start = messages[startIdx];
@@ -35,6 +36,8 @@ export function detectAndMark(messages, branchPairs, adapter) {
       marked += 1;
     }
   });
-  console.log(`WB Detection: Marked ${marked} messages.`);
+  // console.log(`WB Detection: Marked ${marked} messages.${adapter.constructor.name ? ' (Adapter: ' + adapter.constructor.name + ')' : ''}`);
   return { marked };
 }
+
+
