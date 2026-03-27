@@ -135,4 +135,22 @@ Installation & Usage
 
 Roadmap
 -------
-[ ] Multi-Model Support: Complete 100% selector mapping for Claude 3.5 Sonnet and Gemini.
+[ ] Multi-Model Support: Complete 100% selector mapping for Claude and Gemini.
+
+
+## 🛠️ Getting Started (Developer Installation)
+
+This tool is optimized for high-frequency LLM debugging. To ensure the lowest latency and full access to source code, please install it via **Chrome Developer Mode**:
+
+1.  **Clone or Download:** - Click the green `<> Code` button and select **Download ZIP**, then extract it locally.
+    - Or run: `git clone https://github.com/chenghongm/agi-anti-drowning-tool.git`
+
+2.  **Access Extensions:** - Open Chrome and navigate to `chrome://extensions/`.
+
+3.  **Enable Developer Mode:** - Toggle the **"Developer mode"** switch in the top-right corner.
+
+4.  **Load the Tool:** - Click the **"Load unpacked"** button.
+    - Select the root folder of this project (the one containing `manifest.json`).
+
+5.  **Experience it:** - Open any supported AI platform (ChatGPT/Claude).
+    - Look for the **AGI Anti-Drowning** toolbar to start compressing long dialogues and managing complex node branches.
