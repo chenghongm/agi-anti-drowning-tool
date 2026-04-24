@@ -124,8 +124,12 @@ function isChatGPTAdapter() {
     return currentAdapter instanceof ChatGPTAdapter;
 }
 
-function isChatGPTAssistantMessage(el) {
-    if (!isChatGPTAdapter() || !(el instanceof HTMLElement)) return false;
+function isAssistantToggleSupported() {
+    return currentAdapter instanceof ChatGPTAdapter || currentAdapter instanceof GeminiAdapter;
+}
+
+function isAssistantMessage(el) {
+    if (!isAssistantToggleSupported() || !(el instanceof HTMLElement)) return false;
     const assistantSelectors = currentAdapter.selectors?.assistantMessage || [];
     return assistantSelectors.some(selector => el.matches(selector) || !!el.querySelector(selector));
 }
@@ -188,11 +192,11 @@ function updateAssistantToggleTitle(btn, isHidden) {
 }
 
 function syncAssistantRunVisibility() {
-    if (!isChatGPTAdapter()) return;
+    if (!isAssistantToggleSupported()) return;
 
     const isHidden = document.body.classList.contains('wb-assistant-runs-hide');
     currentAdapter.findMessages().forEach(el => {
-        if (!isChatGPTAssistantMessage(el)) return;
+        if (!isAssistantMessage(el)) return;
 
         el.toggleAttribute('data-wb-assistant-hidden', isHidden);
 
@@ -206,7 +210,7 @@ function syncAssistantRunVisibility() {
 }
 
 function injectAssistantToggle() {
-    if (!isChatGPTAdapter()) return;
+    if (!isAssistantToggleSupported()) return;
     if (document.getElementById('wb-assistant-toggle')) return;
 
     const globalBtn = document.getElementById('wb-global-toggle');
@@ -423,7 +427,7 @@ const injectUI = () => {
         }
         if (isChatGPTAdapter()) {
             btnArea.dataset.wbChatgptAnchor = 'sibling';
-            if (isChatGPTAssistantMessage(el)) btnArea.dataset.wbAssistantControl = 'true';
+            if (isAssistantMessage(el)) btnArea.dataset.wbAssistantControl = 'true';
             el.parentElement?.insertBefore(btnArea, el);
         } else if (!attachPoint) {
             // fallback: prepend to element

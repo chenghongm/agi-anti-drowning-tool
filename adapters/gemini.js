@@ -9,6 +9,10 @@ export class GeminiAdapter extends BaseAdapter {
             idAttribute: 'id', 
             userQuery: 'user-query',
             modelResponse: 'model-response',
+            assistantMessage: [
+                '[data-wb-turn-id$="-model"]',
+                'model-response'
+            ],
             codeBlock: 'pre',
             actionArea: 'message-actions .actions-container-v2'
         };
