@@ -9,6 +9,9 @@ export class GrokAdapter extends BaseAdapter {
       messageEntry: 'main div[id^="response-"]',
       idAttribute: 'id',
       roleAttribute: 'data-testimonial', // unused by current UI logic
+      assistantMessage: [
+        '[data-testid="assistant-message"]'
+      ],
       codeBlock: 'pre',
       // Prefer injecting at the message container (fallback handled in content_module.js)
     };

@@ -128,6 +128,7 @@ function isAssistantToggleSupported() {
     return (
         currentAdapter instanceof ChatGPTAdapter ||
         currentAdapter instanceof ClaudeAdapter ||
+        currentAdapter instanceof GrokAdapter ||
         currentAdapter instanceof GeminiAdapter
     );
 }
@@ -135,7 +136,21 @@ function isAssistantToggleSupported() {
 function isAssistantMessage(el) {
     if (!isAssistantToggleSupported() || !(el instanceof HTMLElement)) return false;
     const assistantSelectors = currentAdapter.selectors?.assistantMessage || [];
+    if (currentAdapter instanceof GrokAdapter) {
+        return assistantSelectors.some(selector => el.matches(selector));
+    }
     return assistantSelectors.some(selector => el.matches(selector) || !!el.querySelector(selector));
+}
+
+function getAssistantMessagesForToggle() {
+    if (!isAssistantToggleSupported()) return [];
+
+    const assistantSelectors = currentAdapter.selectors?.assistantMessage || [];
+    if (currentAdapter instanceof GrokAdapter && assistantSelectors.length > 0) {
+        return Array.from(document.querySelectorAll(assistantSelectors.join(','))).filter(el => el instanceof HTMLElement);
+    }
+
+    return currentAdapter.findMessages().filter(isAssistantMessage);
 }
 
 function getMessageElementById(msgId) {
@@ -199,9 +214,14 @@ function syncAssistantRunVisibility() {
     if (!isAssistantToggleSupported()) return;
 
     const isHidden = document.body.classList.contains('wb-assistant-runs-hide');
-    currentAdapter.findMessages().forEach(el => {
-        if (!isAssistantMessage(el)) return;
+    const assistantMessages = getAssistantMessagesForToggle();
+    const assistantMessageSet = new Set(assistantMessages);
 
+    currentAdapter.findMessages().forEach(el => {
+        if (!assistantMessageSet.has(el)) el.removeAttribute('data-wb-assistant-hidden');
+    });
+
+    assistantMessages.forEach(el => {
         el.toggleAttribute('data-wb-assistant-hidden', isHidden);
 
         const turnId = currentAdapter.getMessageId(el);
