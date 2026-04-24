@@ -55,7 +55,6 @@ try {
 
 let branchPairs = JSON.parse(localStorage.getItem('wb_pairs') || '[]');
 let pendingStartId = null;
-
 // Persistence helpers (page context): use localStorage so module can run in page
 function loadPairs() {
     try {
@@ -121,6 +120,10 @@ function setupHoverLogic(el) {
     });
 }
 
+function isChatGPTAdapter() {
+    return currentAdapter instanceof ChatGPTAdapter;
+}
+
 function getMessageElementById(msgId) {
     try {
         if (!msgId) return null;
@@ -160,7 +163,7 @@ function updateButtonStates() {
 
             // When a start is pending, disable both Start and End on the same message
             if (pendingStartId && msgId === pendingStartId && (action === 'start' || action === 'end')) {
-                console.debug(`Disabling ${action} button on pending start message [${msgId}] ${pendingStartId ? '(pendingStartId: ' + pendingStartId + ')' : ' (no pending start)'}`);
+                // console.debug(`Disabling ${action} button on pending start message [${msgId}] ${pendingStartId ? '(pendingStartId: ' + pendingStartId + ')' : ' (no pending start)'}`);
                 disabled = true;
             }
 
@@ -289,6 +292,7 @@ const injectUI = () => {
         // create S/E/R button group (no inline HTML)
         const btnArea = document.createElement('div');
         btnArea.className = 'wb-branch-group';
+        btnArea.dataset.msgId = turnId;
         btnArea.style.display = 'inline-flex';
         btnArea.style.gap = '4px';
 
@@ -324,7 +328,10 @@ const injectUI = () => {
         if (!attachPoint && currentAdapter.findActionArea) {
             attachPoint = currentAdapter.findActionArea(el);
         }
-        if (!attachPoint) {
+        if (isChatGPTAdapter()) {
+            btnArea.dataset.wbChatgptAnchor = 'sibling';
+            el.parentElement?.insertBefore(btnArea, el);
+        } else if (!attachPoint) {
             // fallback: prepend to element
             el.prepend(btnArea);
         } else {

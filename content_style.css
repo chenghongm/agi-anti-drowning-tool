@@ -71,6 +71,18 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 
+.wb-branch-group[data-wb-chatgpt-anchor="sibling"] {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: fit-content !important;
+    margin: 4px 0 4px 32px !important;
+    z-index: 10000 !important;
+    opacity: 1 !important;
+    filter: none !important;
+    pointer-events: auto !important;
+}
+
 /* Grok (x.ai) tweak: pull buttons into the left gutter for easier visibility */
 .wb-host-grok .wb-branch-group {
     left: -62px !important;
