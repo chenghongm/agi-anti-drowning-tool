@@ -37,6 +37,12 @@ export class ChatGPTAdapter extends BaseAdapter {
     // Optional role-like attribute if present in your DOM
     roleAttribute: 'data-message-author-role',
 
+    // Assistant turns in current and recent ChatGPT DOMs
+    assistantMessage: [
+      '[data-turn="assistant"]',
+      '[data-message-author-role="assistant"]'
+    ],
+
     // Code blocks
     codeBlock: 'pre',
 

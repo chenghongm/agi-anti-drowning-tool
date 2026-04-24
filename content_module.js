@@ -124,6 +124,12 @@ function isChatGPTAdapter() {
     return currentAdapter instanceof ChatGPTAdapter;
 }
 
+function isChatGPTAssistantMessage(el) {
+    if (!isChatGPTAdapter() || !(el instanceof HTMLElement)) return false;
+    const assistantSelectors = currentAdapter.selectors?.assistantMessage || [];
+    return assistantSelectors.some(selector => el.matches(selector) || !!el.querySelector(selector));
+}
+
 function getMessageElementById(msgId) {
     try {
         if (!msgId) return null;
@@ -176,10 +182,96 @@ function updateButtonStates() {
 }
 
 
+function updateAssistantToggleTitle(btn, isHidden) {
+    btn.title = isHidden ? 'Show Assistant Runs' : 'Hide Assistant Runs';
+    btn.setAttribute('aria-label', btn.title);
+}
+
+function syncAssistantRunVisibility() {
+    if (!isChatGPTAdapter()) return;
+
+    const isHidden = document.body.classList.contains('wb-assistant-runs-hide');
+    currentAdapter.findMessages().forEach(el => {
+        if (!isChatGPTAssistantMessage(el)) return;
+
+        el.toggleAttribute('data-wb-assistant-hidden', isHidden);
+
+        const turnId = currentAdapter.getMessageId(el);
+        if (!turnId) return;
+
+        document
+            .querySelectorAll(`.wb-branch-group[data-msg-id="${CSS.escape(turnId)}"]`)
+            .forEach(group => group.toggleAttribute('data-wb-assistant-hidden', isHidden));
+    });
+}
+
+function injectAssistantToggle() {
+    if (!isChatGPTAdapter()) return;
+    if (document.getElementById('wb-assistant-toggle')) return;
+
+    const globalBtn = document.getElementById('wb-global-toggle');
+    if (!globalBtn) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'wb-assistant-toggle';
+    btn.textContent = 'A';
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('aria-pressed', 'false');
+
+    updateAssistantToggleTitle(btn, document.body.classList.contains('wb-assistant-runs-hide'));
+    btn.addEventListener('click', () => {
+        const isHidden = document.body.classList.toggle('wb-assistant-runs-hide');
+        btn.style.background = isHidden ? '#b4dbca' : '#10a37f';
+        btn.setAttribute('aria-pressed', String(isHidden));
+        updateAssistantToggleTitle(btn, isHidden);
+        syncAssistantRunVisibility();
+    });
+
+    Object.assign(btn.style, {
+        position: 'fixed',
+        right: '6px',
+        zIndex: 2147483647,
+        width: '40px',
+        height: '40px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '10px',
+        background: '#10a37f',
+        color: '#ffffff',
+        fontSize: '15px',
+        fontWeight: '800',
+        boxShadow: '0 6px 18px rgba(16,163,127,0.16)',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'background .18s ease, transform .12s ease'
+    });
+
+    btn.addEventListener('mouseenter', () => btn.style.transform = 'translateY(-2px)');
+    btn.addEventListener('mouseleave', () => btn.style.transform = 'translateY(0)');
+
+    document.body.appendChild(btn);
+
+    function positionAssistantToggle() {
+        const globalRect = globalBtn.getBoundingClientRect();
+        btn.style.top = `${Math.max(8, globalRect.top - 52)}px`;
+        btn.style.bottom = '';
+    }
+
+    window.addEventListener('resize', positionAssistantToggle);
+    const repositionObserver = new MutationObserver(() => positionAssistantToggle());
+    repositionObserver.observe(globalBtn, { attributes: true, attributeFilter: ['style'] });
+    positionAssistantToggle();
+    syncAssistantRunVisibility();
+}
+
 
 // 注入全局开关
 function injectGlobalToggle() {
-    if (document.getElementById('wb-global-toggle')) return;
+    if (document.getElementById('wb-global-toggle')) {
+        injectAssistantToggle();
+        return;
+    }
     const btn = document.createElement('div');
     btn.id = 'wb-global-toggle';
     btn.setAttribute('role', 'button');
@@ -236,6 +328,7 @@ function injectGlobalToggle() {
     btn.addEventListener('mouseleave', () => btn.style.transform = 'translateY(0)');
 
     document.body.appendChild(btn);
+    injectAssistantToggle();
 
     // Positioning helper: place right above nav panel if present
     function positionGlobalToggle() {
@@ -330,6 +423,7 @@ const injectUI = () => {
         }
         if (isChatGPTAdapter()) {
             btnArea.dataset.wbChatgptAnchor = 'sibling';
+            if (isChatGPTAssistantMessage(el)) btnArea.dataset.wbAssistantControl = 'true';
             el.parentElement?.insertBefore(btnArea, el);
         } else if (!attachPoint) {
             // fallback: prepend to element
@@ -371,6 +465,7 @@ const injectUI = () => {
     });
 
     applyLogic();
+    syncAssistantRunVisibility();
 };
 
 // Handler for S/E/R actions
