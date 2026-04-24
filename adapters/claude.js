@@ -7,6 +7,9 @@ export class ClaudeAdapter extends BaseAdapter {
       threadContainer: 'main',
       messageEntry: '[data-testid="user-message"], .font-claude-response',
       idAttribute: 'data-wb-turn-id',
+      assistantMessage: [
+        '.font-claude-response'
+      ],
       codeBlock: 'pre',
       actionArea: null
     };

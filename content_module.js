@@ -125,7 +125,11 @@ function isChatGPTAdapter() {
 }
 
 function isAssistantToggleSupported() {
-    return currentAdapter instanceof ChatGPTAdapter || currentAdapter instanceof GeminiAdapter;
+    return (
+        currentAdapter instanceof ChatGPTAdapter ||
+        currentAdapter instanceof ClaudeAdapter ||
+        currentAdapter instanceof GeminiAdapter
+    );
 }
 
 function isAssistantMessage(el) {
