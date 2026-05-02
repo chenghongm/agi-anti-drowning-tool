@@ -59,7 +59,7 @@ currentAdapter: 通过检测 window.location.host 自动切换选择器。
 
 下一步规划 (Roadmap)
 ------------------
-[ ] 多模型深度匹配: 完成对 Claude 3.5/Sonnet 复杂 DOM 结构的 100% 适配。
+[ ] 多模型深度匹配: 完成对 Claude 3.5/Sonnet, ChatGpt, Gemini, Grok 复杂 DOM 结构的 100% 适配。
 
 
 
@@ -97,6 +97,9 @@ Zero Distraction: Removed redundant local buttons. Code blocks expand/collapse i
 Quick Anchors: Generates a numerical index panel on the right side of the screen. Clicking a number scrolls the page directly to the corresponding Start Node.
 
 Global Toggle: Includes a global switch to toggle code block visibility across the entire conversation.
+
+5. Toggle Assistant output visibility
+One click to toggle ai assistant output display and hide allowing user extract their own thought outlined clearly.  
 
 
 Technical Architecture
