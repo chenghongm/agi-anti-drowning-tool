@@ -220,6 +220,25 @@ function updateAssistantToggleTitle(btn, isHidden) {
     btn.setAttribute('aria-label', btn.title);
 }
 
+function updateCompactToggleTitle(btn, isCompact) {
+    btn.title = isCompact ? 'Show Full Conversation' : 'Shorten Conversation';
+    btn.setAttribute('aria-label', btn.title);
+}
+
+function syncConversationCompactVisibility() {
+    const isCompact = document.body.classList.contains('wb-conversation-compact');
+    const messages = currentAdapter.findMessages();
+    const messageSet = new Set(messages);
+
+    document.querySelectorAll('[data-wb-compact-target]').forEach(el => {
+        if (!messageSet.has(el)) el.removeAttribute('data-wb-compact-target');
+    });
+
+    messages.forEach(el => {
+        el.toggleAttribute('data-wb-compact-target', isCompact);
+    });
+}
+
 function syncAssistantRunVisibility() {
     if (!isAssistantToggleSupported()) return;
 
@@ -251,6 +270,67 @@ function syncAssistantRunVisibility() {
             .querySelectorAll(`.wb-branch-group[data-msg-id="${CSS.escape(turnId)}"]`)
             .forEach(group => group.toggleAttribute('data-wb-assistant-hidden', isHidden));
     });
+}
+
+function injectCompactToggle() {
+    if (document.getElementById('wb-compact-toggle')) return;
+
+    const assistantBtn = document.getElementById('wb-assistant-toggle');
+    const globalBtn = document.getElementById('wb-global-toggle');
+    const anchorBtn = assistantBtn || globalBtn;
+    if (!anchorBtn) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'wb-compact-toggle';
+    btn.textContent = 'S';
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('aria-pressed', 'false');
+
+    updateCompactToggleTitle(btn, document.body.classList.contains('wb-conversation-compact'));
+    btn.addEventListener('click', () => {
+        const isCompact = document.body.classList.toggle('wb-conversation-compact');
+        btn.style.background = isCompact ? '#b4dbca' : '#10a37f';
+        btn.setAttribute('aria-pressed', String(isCompact));
+        updateCompactToggleTitle(btn, isCompact);
+        syncConversationCompactVisibility();
+    });
+
+    Object.assign(btn.style, {
+        position: 'fixed',
+        right: '6px',
+        zIndex: 2147483647,
+        width: '40px',
+        height: '40px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '10px',
+        background: '#10a37f',
+        color: '#ffffff',
+        fontSize: '15px',
+        fontWeight: '800',
+        boxShadow: '0 6px 18px rgba(16,163,127,0.16)',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'background .18s ease, transform .12s ease'
+    });
+
+    btn.addEventListener('mouseenter', () => btn.style.transform = 'translateY(-2px)');
+    btn.addEventListener('mouseleave', () => btn.style.transform = 'translateY(0)');
+
+    document.body.appendChild(btn);
+
+    function positionCompactToggle() {
+        const anchorRect = anchorBtn.getBoundingClientRect();
+        btn.style.top = `${Math.max(8, anchorRect.top - 52)}px`;
+        btn.style.bottom = '';
+    }
+
+    window.addEventListener('resize', positionCompactToggle);
+    const repositionObserver = new MutationObserver(() => positionCompactToggle());
+    repositionObserver.observe(anchorBtn, { attributes: true, attributeFilter: ['style'] });
+    positionCompactToggle();
+    syncConversationCompactVisibility();
 }
 
 function injectAssistantToggle() {
@@ -311,6 +391,7 @@ function injectAssistantToggle() {
     repositionObserver.observe(globalBtn, { attributes: true, attributeFilter: ['style'] });
     positionAssistantToggle();
     syncAssistantRunVisibility();
+    injectCompactToggle();
 }
 
 
@@ -318,6 +399,7 @@ function injectAssistantToggle() {
 function injectGlobalToggle() {
     if (document.getElementById('wb-global-toggle')) {
         injectAssistantToggle();
+        injectCompactToggle();
         return;
     }
     const btn = document.createElement('div');
@@ -377,6 +459,7 @@ function injectGlobalToggle() {
 
     document.body.appendChild(btn);
     injectAssistantToggle();
+    injectCompactToggle();
 
     // Positioning helper: place right above nav panel if present
     function positionGlobalToggle() {
@@ -514,6 +597,7 @@ const injectUI = () => {
 
     applyLogic();
     syncAssistantRunVisibility();
+    syncConversationCompactVisibility();
 };
 
 // Handler for S/E/R actions

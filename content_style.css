@@ -87,6 +87,16 @@
     display: none !important;
 }
 
+body.wb-conversation-compact [data-wb-compact-target] {
+    max-height: min(150px, 7.5em) !important;
+    overflow: hidden !important;
+    opacity: 1 !important;
+    filter: none !important;
+    cursor: zoom-in;
+    mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent 100%);
+}
+
 /* Grok (x.ai) tweak: pull buttons into the left gutter for easier visibility */
 .wb-host-grok .wb-branch-group {
     left: -62px !important;
