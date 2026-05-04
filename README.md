@@ -1,4 +1,4 @@
-Web-Branch-Blinds (v1.5)
+Web-Branch-Blinds (v1.6)
 ========================
 Web-Branch-Blinds 是一款专为 AI 聊天界面（如 ChatGPT）设计的长对话管理工具。它通过“百叶窗”式的交互逻辑，帮助开发者和深度用户在长达数百条的消息流中，精确标记、折叠和定位不同的讨论分支。
 
@@ -67,7 +67,7 @@ currentAdapter: 通过检测 window.location.host 自动切换选择器。
 
 
 
-Web-Branch-Blinds (v1.5)
+Web-Branch-Blinds (v1.6)
 ========================
 Web-Branch-Blinds is a productivity-focused browser extension/userscript designed for AI chat interfaces (specifically ChatGPT). It introduces a "Blind-style" interactive logic to help developers and power users manage long, complex conversations by precisely marking, collapsing, and navigating different discussion branches.
 
