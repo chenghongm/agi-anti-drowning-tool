@@ -124,6 +124,10 @@ function isChatGPTAdapter() {
     return currentAdapter instanceof ChatGPTAdapter;
 }
 
+function isGrokAdapter() {
+    return currentAdapter instanceof GrokAdapter;
+}
+
 function isAssistantToggleSupported() {
     return (
         currentAdapter instanceof ChatGPTAdapter ||
@@ -184,6 +188,14 @@ function getMessageElementById(msgId) {
         return null;
     }
 }
+// Grok used only; To avoid conflict with Grok's own timeline component.
+function getSideControlTopOffset(index = 0) {
+    const baseTop = 60;
+    const buttonSize = 40;
+    const gap = 12;
+    return baseTop + (index * (buttonSize + gap));
+}
+
 // Centralized updater for S/E/R button states
 function updateButtonStates() {
     try {
@@ -321,6 +333,11 @@ function injectCompactToggle() {
     document.body.appendChild(btn);
 
     function positionCompactToggle() {
+        if (isGrokAdapter()) {
+            btn.style.top = `${getSideControlTopOffset(0)}px`;
+            btn.style.bottom = '';
+            return;
+        }
         const anchorRect = anchorBtn.getBoundingClientRect();
         btn.style.top = `${Math.max(8, anchorRect.top - 52)}px`;
         btn.style.bottom = '';
@@ -381,6 +398,11 @@ function injectAssistantToggle() {
     document.body.appendChild(btn);
 
     function positionAssistantToggle() {
+        if (isGrokAdapter()) {
+            btn.style.top = `${getSideControlTopOffset(1)}px`;
+            btn.style.bottom = '';
+            return;
+        }
         const globalRect = globalBtn.getBoundingClientRect();
         btn.style.top = `${Math.max(8, globalRect.top - 52)}px`;
         btn.style.bottom = '';
@@ -463,6 +485,11 @@ function injectGlobalToggle() {
 
     // Positioning helper: place right above nav panel if present
     function positionGlobalToggle() {
+        if (isGrokAdapter()) {
+            btn.style.top = `${getSideControlTopOffset(2)}px`;
+            btn.style.bottom = '';
+            return;
+        }
         const nav = document.getElementById('wb-nav-panel');
         if (!nav) {
             btn.style.bottom = '18px';
@@ -704,6 +731,17 @@ function handleBranchAction(action, turnId) {
 const updateMobileNav = () => {
     let nav = document.getElementById('wb-nav-panel') || document.createElement('div');
     nav.id = 'wb-nav-panel'; document.body.appendChild(nav);
+    if (isGrokAdapter()) {
+        Object.assign(nav.style, {
+            top: `${getSideControlTopOffset(3)}px`,
+            bottom: 'auto',
+            transform: 'none'
+        });
+    } else {
+        nav.style.top = '';
+        nav.style.bottom = '';
+        nav.style.transform = '';
+    }
     // Clear nav and add a scroll-to-bottom control (use JS event listeners to satisfy CSP)
     nav.replaceChildren();
     const topDot = document.createElement('div');

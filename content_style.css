@@ -102,10 +102,34 @@ body.wb-conversation-compact [data-wb-compact-target] {
     left: -62px !important;
 }
 
+/* Grok short mode: keep SER controls inside the clipped card so they stay readable */
+html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] {
+    padding-top: 34px !important;
+}
+
+html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] > .wb-branch-group {
+    top: 6px !important;
+    left: 8px !important;
+}
+
+/* Grok short mode: hide the native action bar so the compact card stays clean */
+html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] .action-buttons,
+html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] [class~="action-buttons"] {
+    display: none !important;
+}
+
 /* Grok (x.ai) small screens */
 @media (max-width: 640px) {
     .wb-host-grok .wb-branch-group {
         left: -12px !important;
+    }
+
+    html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] {
+        padding-top: 38px !important;
+    }
+
+    html.wb-host-grok body.wb-conversation-compact [data-wb-compact-target] > .wb-branch-group {
+        left: 6px !important;
     }
 }
 
