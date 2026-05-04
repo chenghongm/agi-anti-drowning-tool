@@ -196,6 +196,60 @@ function getSideControlTopOffset(index = 0) {
     return baseTop + (index * (buttonSize + gap));
 }
 
+function findScrollableAncestor(el) {
+    let current = el;
+    while (current && current !== document.body && current !== document.documentElement) {
+        if (current instanceof HTMLElement) {
+            const style = window.getComputedStyle(current);
+            const overflowY = style.overflowY;
+            const isScrollable = (overflowY === 'auto' || overflowY === 'scroll') && current.scrollHeight > current.clientHeight;
+            if (isScrollable) return current;
+        }
+        current = current.parentElement;
+    }
+    return null;
+}
+
+function getConversationScrollTarget() {
+    const threadContainer = currentAdapter.getThreadContainer?.();
+    const scrollableContainer = threadContainer ? findScrollableAncestor(threadContainer) : null;
+    return scrollableContainer || document.scrollingElement || document.documentElement || document.body;
+}
+
+function isElementVisible(el) {
+    if (!(el instanceof HTMLElement)) return false;
+    if (el.hidden) return false;
+    if (el.hasAttribute('data-wb-assistant-hidden')) return false;
+
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    if (el.offsetParent === null && style.position !== 'fixed') return false;
+
+    return true;
+}
+
+function scrollConversationToBottom() {
+    const messages = currentAdapter.findMessages?.() || [];
+    const lastVisibleMessage = [...messages].reverse().find(isElementVisible);
+    if (lastVisibleMessage instanceof Element) {
+        lastVisibleMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        return;
+    }
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage instanceof Element) {
+        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        return;
+    }
+
+    const target = getConversationScrollTarget();
+    if (target instanceof Element) {
+        target.scrollTo({ top: target.scrollHeight, behavior: 'smooth' });
+        return;
+    }
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
 // Centralized updater for S/E/R button states
 function updateButtonStates() {
     try {
@@ -747,7 +801,9 @@ const updateMobileNav = () => {
     const topDot = document.createElement('div');
     topDot.className = 'wb-nav-dot';
     topDot.innerText = '↓';
-    topDot.addEventListener('click', () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }));
+    topDot.title = 'Scroll to bottom';
+    topDot.setAttribute('aria-label', 'Scroll to bottom');
+    topDot.addEventListener('click', () => scrollConversationToBottom());
     nav.appendChild(topDot);
 
     document.querySelectorAll('[data-wb-role="start"]').forEach((el, i) => {
